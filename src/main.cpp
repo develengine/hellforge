@@ -26,6 +26,9 @@ void loadMNISTDigitSet(
     std::string teImages
 ) {
     MDVM::loadMDVMFile("res/" + trImages, 3, trainingImages);    
+    MDVM::loadMDVMFile("res/" + trLabels, 1, trainingLabels);
+    MDVM::loadMDVMFile("res/" + teImages, 3, testImages);
+    MDVM::loadMDVMFile("res/" + teLabels, 1, testLabels);
 }
 
 void freeMNISTDigitSet() { 
