@@ -11,7 +11,7 @@ namespace MDVM {
                            bytes[3]);
     }
     
-    int loadMDVMFile(std::string path, int dimc, uint8_t *dest) { 
+    int loadMDVMFile(std::string path, int dimc, uint8_t **dest) { 
         auto f = fopen(path.c_str(), "r");
         uint8_t bytes[4 + dimc * 4];
         
@@ -35,8 +35,8 @@ namespace MDVM {
             std::cout << dimensions[i] << '\n';
     #endif
     
-        dest = new uint8_t[dataLength];
-        read = fread(dest, dataLength, 1, f);
+        *dest = new uint8_t[dataLength];
+        read = fread(*dest, dataLength, 1, f);
         if (read != 1)
             return read;
         
