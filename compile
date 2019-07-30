@@ -6,22 +6,67 @@ import json
 
 operating_system = os.name
 
-compiler = "clang++"
-program_name = "program.exe"
-src_file_extensions = [ "cpp" ]
-inc_file_extensions = [ "hpp" ]
+compiler = "gcc"
+program_name = "a.out"
+src_file_extensions = [ ]
+inc_file_extensions = [ ]
 object_directory = "obj"
 
-source_directories  = [ "src" ]
-include_directories = [ "include" ]
+source_directories  = [ ]
+include_directories = [ ]
 library_directories = [ ]
 additional_sources  = [ ]
 additional_objects  = [ ]
 
 libraries = [ ]
-defines   = [ "ENG_DEBUG" ]
-flags     = [ "-Wall" ]
+defines   = [ ]
+flags     = [ ]
 
+info_file = sys.argv[1]
+modinfo_name = info_file + ".modinfo.json"
+
+compiler_buffer = [ ]
+program_name_buffer = [ ]
+object_directory_buffer = [ ]
+
+with open(info_file, 'r') as f:
+    target = None
+    for line in f:
+        text = line[:-1]
+        if text.strip() == "":
+            target = None
+        elif "#compiler" in text:
+            target = compiler_buffer
+        elif "#program_name" in text:
+            target = program_name_buffer
+        elif "#src_file_extensions" in text:
+            target = src_file_extensions
+        elif "#inc_file_extensions" in text:
+            target = inc_file_extensions
+        elif "#object_directory" in text:
+            target = object_directory_buffer
+        elif "#source_directories" in text:
+            target = source_directories
+        elif "#include_directories" in text:
+            target = include_directories
+        elif "#library_directories" in text:
+            target = library_directories
+        elif "#additional_sources" in text:
+            target = additional_sources
+        elif "#additional_objects" in text:
+            target = additional_objects
+        elif "#libraries" in text:
+            target = libraries
+        elif "#defines" in text:
+            target = defines
+        elif "#flags" in text:
+            target = flags
+        elif target != None:
+            target.append(text.strip())
+
+compiler = compiler_buffer[-1]
+program_name = program_name_buffer[-1]
+object_directory = object_directory_buffer[-1]
 
 def endswith_lst(input_str, ends):
     """ 'endswith' but compares with list of arguments """
@@ -48,12 +93,12 @@ def comm_compile(args):
     def load_modification_info():
         """ Loads info about src file modification times """
         try:
-            with open("modinfo.json", 'r') as file:
+            with open(modinfo_name, 'r') as file:
                 data = json.load(file)
                 return data
         except Exception:
-            print("Created 'modinfo.json'")
-            with open("modinfo.json", 'w') as file:
+            print("Created " + modinfo_name)
+            with open(modinfo_name, 'w') as file:
                 json.dump({"src":{},"inc":{}}, file, sort_keys = True, indent = 4)
                 return {"src":{},"inc":{}}
 
@@ -159,7 +204,7 @@ def comm_compile(args):
             mod_info["src"][src_file]["ifl"] = parse_file_for_includes(src_file)
 
     # Save mod_info
-    with open("modinfo.json", 'w') as file:
+    with open(modinfo_name, 'w') as file:
         json.dump(mod_info, file, sort_keys = True, indent = 4)
 
     # Create executable binary
@@ -191,6 +236,6 @@ def caller(args):
     elif command == "r" or command == "run":
         comm_run(args[1:])
 
-input_arguments = sys.argv[1:]
+input_arguments = sys.argv[2:]
 
 caller(input_arguments)

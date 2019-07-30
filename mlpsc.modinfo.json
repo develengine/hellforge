@@ -1,0 +1,26 @@
+{
+    "inc": {
+        "include/knnc.hpp": {
+            "ifl": [],
+            "mt": 1560116360.0743067
+        },
+        "include/mdvmreader.hpp": {
+            "ifl": [],
+            "mt": 1560116361.5463154
+        }
+    },
+    "src": {
+        "mlp/main.cpp": {
+            "ifl": [
+                "mdvmreader.hpp"
+            ],
+            "mt": 1564491717.234866
+        },
+        "src/mdvmreader.cpp": {
+            "ifl": [
+                "mdvmreader.hpp"
+            ],
+            "mt": 1560116364.178331
+        }
+    }
+}
