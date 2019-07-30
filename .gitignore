@@ -2,4 +2,4 @@
 obj
 res
 */program.exe
-modinfo.json
+*.modinfo.json
