@@ -4,7 +4,7 @@ import sys
 import os
 import json
 
-operating_system = os.name
+operating_system = sys.platform
 
 compiler = "gcc"
 program_name = "a.out"
@@ -29,40 +29,91 @@ compiler_buffer = [ ]
 program_name_buffer = [ ]
 object_directory_buffer = [ ]
 
+compilation_defines = [ operating_system ]
+
 with open(info_file, 'r') as f:
     target = None
+    parsing = True
     for line in f:
         text = line[:-1]
+        stripped_text = text.strip()
+
+        if parsing:
+            if stripped_text.startswith("#ifdef"):
+                is_def = False
+                for i in compilation_defines:
+                    if i in stripped_text[5:]:
+                        is_def = True
+                        break
+                parsing = is_def
+                continue
+            if stripped_text.startswith("#ifndef"):
+                is_def = True
+                for i in compilation_defines:
+                    if i in stripped_text[6:]:
+                        is_def = False
+                        break
+                parsing = is_def
+                continue
+
+        if stripped_text.startswith("#endif"):
+            parsing = True
+            continue
+        if stripped_text.startswith("#else"):
+            parsing = not parsing
+            continue
+
+        if not parsing:
+            continue
+
+        if stripped_text.startswith("#print "):
+            print(stripped_text[6:])
+            continue
+
         if text.strip() == "":
             target = None
-        elif "#compiler" in text:
+            continue
+        if "#compiler" in text:
             target = compiler_buffer
-        elif "#program_name" in text:
+            continue
+        if "#program_name" in text:
             target = program_name_buffer
-        elif "#src_file_extensions" in text:
+            continue
+        if "#src_file_extensions" in text:
             target = src_file_extensions
-        elif "#inc_file_extensions" in text:
+            continue
+        if "#inc_file_extensions" in text:
             target = inc_file_extensions
-        elif "#object_directory" in text:
+            continue
+        if "#object_directory" in text:
             target = object_directory_buffer
-        elif "#source_directories" in text:
+            continue
+        if "#source_directories" in text:
             target = source_directories
-        elif "#include_directories" in text:
+            continue
+        if "#include_directories" in text:
             target = include_directories
-        elif "#library_directories" in text:
+            continue
+        if "#library_directories" in text:
             target = library_directories
-        elif "#additional_sources" in text:
+            continue
+        if "#additional_sources" in text:
             target = additional_sources
-        elif "#additional_objects" in text:
+            continue
+        if "#additional_objects" in text:
             target = additional_objects
-        elif "#libraries" in text:
+            continue
+        if "#libraries" in text:
             target = libraries
-        elif "#defines" in text:
+            continue
+        if "#defines" in text:
             target = defines
-        elif "#flags" in text:
+            continue
+        if "#flags" in text:
             target = flags
-        elif target != None:
-            target.append(text.strip())
+            continue
+        if target != None:
+            target.append(stripped_text)
 
 compiler = compiler_buffer[-1]
 program_name = program_name_buffer[-1]
@@ -220,7 +271,7 @@ def comm_compile(args):
 def comm_run(args):
     """ Command for running compiled programs """
     return_value = -666
-    if operating_system == "posix":
+    if operating_system == "linux":
         return sys_call("./" + program_name, ' '.join(args))
     else:
         print("Current platform needs to be configured!")

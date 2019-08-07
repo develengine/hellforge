@@ -1,0 +1,38 @@
+#compiler
+clang++
+
+#program_name
+ups/program.exe
+
+#src_file_extensions
+cpp
+
+#inc_file_extensions
+hpp
+
+#object_directory
+ups/obj
+
+#source_directories
+ups
+
+#include_directories
+include
+ups
+
+#libraries
+SDL2
+SDL2_ttf
+
+#defines
+ENG_DEBUG
+
+#flags
+-Wall
+
+#ifndef linux
+#print max kek
+#else
+#print min kek
+#endif
+#print lel
